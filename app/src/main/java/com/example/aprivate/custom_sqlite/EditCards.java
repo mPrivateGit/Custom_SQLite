@@ -38,24 +38,23 @@ public class EditCards extends AppCompatActivity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                writeInBd();
-                readBd(mSQL);
+                writeInDb();
+                readDb(mSQL);
             }
         });
 
-        //TODO
         mDeleteAllButton = (Button) findViewById(R.id.delete_all);
-        mDeleteAllButton.setEnabled(false);
         mDeleteAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //deleteDatabase(BaseShema.CardTable.TABLE_NAME);
-                deleteAll(mSQL);
+                deleteTarget(mSQL, BaseShema.Cols.UUID);
+                //deleteAll(mSQL);
             }
         });
     }
 
-    void writeInBd(){
+    void writeInDb(){
         mSQL = mDbHelper.getWritableDatabase();
 
         Cards cards = new Cards();
@@ -72,7 +71,7 @@ public class EditCards extends AppCompatActivity {
         mSQL.insert(BaseShema.CardTable.TABLE_NAME, null, values);
     }
 
-    void readBd(SQLiteDatabase db){
+    void readDb(SQLiteDatabase db){
         db = mDbHelper.getReadableDatabase();
 
         String projection [] = {
@@ -112,8 +111,22 @@ public class EditCards extends AppCompatActivity {
         }
     }
 
-    private void deleteAll(SQLiteDatabase mSQL) {
-        String target = BaseShema.Cols.UUID;
-        mSQL.delete(BaseShema.CardTable.TABLE_NAME, target, null);
+    private void deleteAll(SQLiteDatabase db) {
+        BaseHelper baseHelper = new BaseHelper(this);
+        db = baseHelper.getWritableDatabase();
+        db.delete(BaseShema.CardTable.TABLE_NAME, null, null);
+    }
+
+    private void deleteTarget(SQLiteDatabase db, String target){
+        BaseHelper baseHelper = new BaseHelper(this);
+        db = baseHelper.getWritableDatabase();
+        String command = "173aca6d-7e1b-4f7b-9f71-e6fa7e15abd8";
+        String test = BaseShema.Cols.UUID +
+                " =" +
+                "'" +
+                command +
+                "'";
+
+        db.delete(BaseShema.CardTable.TABLE_NAME, test, null);
     }
 }
